@@ -11,7 +11,9 @@ class CuyaArtsCultureSpider(CityScrapersSpider):
     name = "cuya_arts_culture"
     agency = "Cuyahoga County Arts & Culture"
     timezone = "America/Detroit"
-    start_urls = ["https://www.cacgrants.org/about-us/board/board-materials/"]
+    start_urls = ["https://www.cacgrants.org/about-us/board/board-meeting-schedule"]
+    time_notes = "Due to COVID, board meetings will be virtually streamed at https://www.youtube.com/cacgrants"
+
 
     def parse(self, response):
         self._parse_minutes(response)
@@ -67,7 +69,7 @@ class CuyaArtsCultureSpider(CityScrapersSpider):
             start=start,
             end=None,
             all_day=False,
-            time_notes="",
+            time_notes=self.time_notes,
             location=self._parse_location(response),
             links=self._parse_links(response) + self.minutes_map[start.date()],
             source=response.url,
@@ -80,7 +82,7 @@ class CuyaArtsCultureSpider(CityScrapersSpider):
 
     def _parse_title(self, response):
         """Parse or generate meeting title."""
-        title_str = response.css("#headline h1::text").extract_first().strip()
+        title_str = response.css(".panel-heading div::text").extract_first().strip()
         title_clean = re.sub(r" [a-zA-Z]{3,10} \d{1,2}, \d{4}", "", title_str)
         if title_clean == "Board Meeting":
             return "Board of Trustees"
